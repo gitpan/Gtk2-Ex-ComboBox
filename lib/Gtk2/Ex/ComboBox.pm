@@ -1,6 +1,6 @@
 package Gtk2::Ex::ComboBox;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 use strict;
 use warnings;
@@ -39,6 +39,11 @@ sub new {
 	return $self;
 }
 
+sub get_treeview {
+	my ($self) = @_;
+	return $self->{slist};
+}
+
 sub set_list {
 	my ($self, $list) = @_;
 	my $slist = $self->{slist};
@@ -56,6 +61,7 @@ sub set_list {
 			push @{$slist->{data}}, [0, $x];
 		}
 	}
+	return 0;
 }
 
 sub show {
@@ -194,6 +200,12 @@ The list of choices is entered using this method. Accepts an array (of strings)
 as the argument.
 
 	$combobox->set_list(['this', 'that', 'what']);
+
+=head2 get_treeview;
+
+Returns the treeview that serves as the model for the ComboBox. This widget
+internally uses Gtk2::Ex::Simple::List and therefore the return object will
+be of that class.
 
 =head2 show;
 

@@ -3,6 +3,7 @@ use warnings;
 use Glib qw(TRUE FALSE);
 use Gtk2 qw/-init/;
 use Gtk2::Ex::ComboBox;
+use Data::Dumper;
 
 my $window = Gtk2::Window->new;
 $window->signal_connect('destroy', sub {Gtk2->main_quit;});
