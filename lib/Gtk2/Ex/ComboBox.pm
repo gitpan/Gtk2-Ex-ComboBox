@@ -1,6 +1,6 @@
 package Gtk2::Ex::ComboBox;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 use strict;
 use warnings;
@@ -35,6 +35,17 @@ sub new {
 		$popup->{window}->add($vbox);
 	} elsif ($type eq 'no-checkbox') {
 		$popup->{window}->add($slist);
+		$slist->get_selection->signal_connect ('changed' =>
+			sub {
+				my @sel = $slist->get_selected_indices;
+				foreach my $line (@{$slist->{data}}) {
+					$line->[0] = FALSE;
+				}
+				foreach my $x (@sel) {
+					$slist->{data}->[$x]->[0] = TRUE;
+				}
+			}
+		);
 	}
 	return $self;
 }
@@ -44,23 +55,56 @@ sub get_treeview {
 	return $self->{slist};
 }
 
-sub set_list {
+sub get_selected_values{
+	my ($self) = @_;
+	my $slist = $self->{slist};
+	my @selectedvalues;
+	my @unselectedvalues;
+	foreach my $x (@{$slist->{data}}) {
+		push @selectedvalues, $x->[1] if $x->[0];
+		push @unselectedvalues, $x->[1] if !$x->[0];
+	}
+	return { 'selected-values' => \@selectedvalues, 'unselected-values' => \@unselectedvalues };
+}
+
+sub get_selected_indices{
+	my ($self) = @_;
+	my $slist = $self->{slist};
+	my @selectedindices;
+	my @unselectedindices;
+	my $i = 0;
+	foreach my $x (@{$slist->{data}}) {
+		push @selectedindices, $i if $x->[0];
+		push @unselectedindices, $i if !$x->[0];
+		$i++;
+	}
+	return { 'selected-indices' => \@selectedindices, 'unselected-indices' => \@unselectedindices };
+}
+
+sub set_list_preselected {
 	my ($self, $list) = @_;
 	my $slist = $self->{slist};
-	@{$slist->{data}} = ();
+	@{$slist->{data}} = @$list;
 	if ($self->{type} eq 'no-checkbox') {
 		$slist->set_headers_visible(FALSE);
 		$slist->get_column(0)->set_visible(FALSE);
 		$slist->get_selection->set_mode ('multiple');
-		foreach my $x (@$list) {
-			push @{$slist->{data}}, [0, $x];
-		}
-		
-	} else {
-		foreach my $x (@$list) {
-			push @{$slist->{data}}, [0, $x];
+		my $i = 0;
+		foreach my $x (@$list) {		
+			$slist->select($i) if $x->[0];
+			$i++;
 		}
 	}
+	return 0;
+}
+
+sub set_list {
+	my ($self, $list) = @_;
+	my @temp;
+	foreach my $x (@$list) {
+		push @temp, [0, $x];
+	}
+	$self->set_list_preselected(\@temp);
 	return 0;
 }
 
@@ -201,11 +245,42 @@ as the argument.
 
 	$combobox->set_list(['this', 'that', 'what']);
 
+=head2 set_list_preselected([$list]);
+
+The list of choices is entered using this method. Accepts an array of arrays
+as the argument. Each element array should have a boolean and a string.
+The boolean denotes whether this element should be marked as selected or not.
+
+	$combobox->set_list([[0,'this'], [1,'that'], [1,'what']]);
+
+In the example shown above, the elements C<'that'> and C<'what'> will be marked
+as I<selected> in the dropdown list.
+
 =head2 get_treeview;
 
 Returns the treeview that serves as the model for the ComboBox. This widget
 internally uses Gtk2::Ex::Simple::List and therefore the return object will
 be of that class.
+
+=head2 get_selected_values;
+
+Returns a hash containing two lists.
+
+C<$hash{'selected-values'}> contains a list of all the values that are marked
+as I<selected>.
+
+C<$hash{'unselected-values'}> contains a list of all the values that are B<not>
+marked as I<selected>.
+
+=head2 get_selected_indices;
+
+Returns a hash containing two lists. 
+
+C<$hash{'selected-indices'}> contains a list of all the indices that are marked
+as I<selected>.
+
+C<$hash{'unselected-indices'}> contains a list of all the indices that are B<not>
+marked as I<selected>.
 
 =head2 show;
 

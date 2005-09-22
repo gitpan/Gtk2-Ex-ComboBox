@@ -6,7 +6,7 @@ use Gtk2::Ex::ComboBox;
 use Gtk2::Ex::Simple::List;
 use Data::Dumper;
 
-use Gtk2::TestHelper tests => 3;
+use Gtk2::TestHelper tests => 7;
 
 my $window = Gtk2::Window->new;
 $window->signal_connect('destroy', sub {Gtk2->main_quit;});
@@ -21,6 +21,14 @@ ok(!$combobox->set_list(['this', 'that', 'what']));
 
 my $slist = $combobox->get_treeview;
 isa_ok($slist, "Gtk2::Ex::Simple::List");
+
+my $selected_indices = $combobox->get_selected_indices;
+is(Dumper($selected_indices->{'selected-indices'}), Dumper([]));
+is(Dumper($selected_indices->{'unselected-indices'}), Dumper([0,1,2]));
+
+my $selected_values = $combobox->get_selected_values;
+is(Dumper($selected_values->{'selected-values'}), Dumper([]));
+is(Dumper($selected_values->{'unselected-values'}), Dumper(['this', 'that', 'what']));
 
 my $text = Gtk2::TextView->new;
 

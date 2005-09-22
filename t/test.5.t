@@ -15,20 +15,20 @@ my $label = Gtk2::Label->new('With-Buttons');
 my $hbox = Gtk2::HBox->new (FALSE, 10);
 $hbox->pack_start ($label, FALSE, TRUE, 0);    
 
-my $combobox = Gtk2::Ex::ComboBox->new($label, 'no-checkbox');
+my $combobox = Gtk2::Ex::ComboBox->new($label, 'with-checkbox');
 isa_ok($combobox, "Gtk2::Ex::ComboBox");
-ok(!$combobox->set_list(['this', 'that', 'what']));
+ok(!$combobox->set_list_preselected([[0,'this'], [1,'that'], [1,'what']]));
 
 my $slist = $combobox->get_treeview;
 isa_ok($slist, "Gtk2::Ex::Simple::List");
 
 my $selected_indices = $combobox->get_selected_indices;
-is(Dumper($selected_indices->{'selected-indices'}), Dumper([]));
-is(Dumper($selected_indices->{'unselected-indices'}), Dumper([0,1,2]));
+is(Dumper($selected_indices->{'selected-indices'}), Dumper([1,2]));
+is(Dumper($selected_indices->{'unselected-indices'}), Dumper([0]));
 
 my $selected_values = $combobox->get_selected_values;
-is(Dumper($selected_values->{'selected-values'}), Dumper([]));
-is(Dumper($selected_values->{'unselected-values'}), Dumper(['this', 'that', 'what']));
+is(Dumper($selected_values->{'selected-values'}), Dumper(['that', 'what']));
+is(Dumper($selected_values->{'unselected-values'}), Dumper(['this']));
 
 my $text = Gtk2::TextView->new;
 

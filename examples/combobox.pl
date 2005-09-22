@@ -31,21 +31,32 @@ my $combobox1 = Gtk2::Ex::ComboBox->new($label1, 'with-buttons');
 $combobox1->set_list(['this', 'that', 'what']);
 
 my $combobox2 = Gtk2::Ex::ComboBox->new($label2, 'with-checkbox');
-$combobox2->set_list(['how', 'when', 'where']);
+$combobox2->set_list_preselected([[0,'how'], [1,'when'], [1,'where']]);
 
 my $combobox3 = Gtk2::Ex::ComboBox->new($label3, 'no-checkbox');
-$combobox3->set_list(['how', 'when', 'where']);
+$combobox3->set_list_preselected([[1,'how'], [0,'when'], [1,'where']]);
 
 my $text = Gtk2::TextView->new;
-
+my $dumpbutton = Gtk2::Button->new('Show Details');
 my $vbox = Gtk2::VBox->new (FALSE, 0);
 $vbox->pack_start ($hbox, FALSE, TRUE, 0);
 $vbox->pack_start ($text, TRUE, TRUE, 0);
+$vbox->pack_start ($dumpbutton, FALSE, TRUE, 0);
 $window->add ($vbox);
 
 $eventbox1->signal_connect('button-release-event' => sub { $combobox1->show; } );
 $eventbox2->signal_connect('button-release-event' => sub { $combobox2->show; } );
 $eventbox3->signal_connect('button-release-event' => sub { $combobox3->show; } );
+$dumpbutton->signal_connect('button-release-event' => 
+	sub {
+		print Dumper $combobox1->get_selected_values;
+		print Dumper $combobox2->get_selected_values;
+		print Dumper $combobox3->get_selected_values;
+		print Dumper $combobox1->get_selected_indices;
+		print Dumper $combobox2->get_selected_indices;
+		print Dumper $combobox3->get_selected_indices;
+	}
+);
 
 $window->set_default_size(500, 200);
 $window->show_all;
