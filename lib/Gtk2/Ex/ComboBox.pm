@@ -1,6 +1,6 @@
 package Gtk2::Ex::ComboBox;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 use strict;
 use warnings;
@@ -22,6 +22,8 @@ sub new {
 	$self->{type} = $type;	
 	my $popup = Gtk2::Ex::PopupWindow->new($parent);
 	$self->{popup} = $popup;
+	$self->{signals} = undef;
+	my $frame = Gtk2::Frame->new;
 	$type = 'with-buttons' unless $type;
 	unless ($type eq 'with-buttons' or $type eq 'with-checkbox' or $type eq 'no-checkbox') {
 		carp "Error: Expecting 'with-buttons' or 'with-checkbox'. Got $type\n";
@@ -29,12 +31,12 @@ sub new {
 	}
 	if ($type eq 'with-buttons') {
 		my $vbox = $self->_make_selectable;
-		$popup->{window}->add($vbox);
+		$frame->add($vbox);
 	} elsif ($type eq 'with-checkbox') {
 		my $vbox = $self->_make_checkable;
-		$popup->{window}->add($vbox);
+		$frame->add($vbox);
 	} elsif ($type eq 'no-checkbox') {
-		$popup->{window}->add($slist);
+		$frame->add($slist);
 		$slist->get_selection->signal_connect ('changed' =>
 			sub {
 				my @sel = $slist->get_selected_indices;
@@ -47,7 +49,13 @@ sub new {
 			}
 		);
 	}
+	$popup->{window}->add($frame);
 	return $self;
+}
+
+sub signal_connect {
+	my ($self, $signal, $callback) = @_;
+	$self->{signals}->{$signal} = $callback;
 }
 
 sub get_treeview {

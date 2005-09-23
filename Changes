@@ -11,3 +11,6 @@ Revision history for Gtk2-Ex-ComboBox
 	* Added method get_selected_values()
 	* Added method get_selected_indices()
 	* Added method set_list_preselected()
+
+0.04	Sep 23, 2005
+	* Added a frame around the slist. Improves visibility
