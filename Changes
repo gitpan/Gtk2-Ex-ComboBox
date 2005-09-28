@@ -14,3 +14,6 @@ Revision history for Gtk2-Ex-ComboBox
 
 0.04	Sep 23, 2005
 	* Added a frame around the slist. Improves visibility
+
+0.05	Sep 28, 2005
+	* Added 'changed' signal. To be triggered if selection changes

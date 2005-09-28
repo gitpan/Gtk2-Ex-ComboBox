@@ -29,12 +29,26 @@ $hbox->pack_start (Gtk2::Label->new('Six'), FALSE, TRUE, 0);
 
 my $combobox1 = Gtk2::Ex::ComboBox->new($label1, 'with-buttons');
 $combobox1->set_list(['this', 'that', 'what']);
-
+$combobox1->signal_connect('changed' => 
+	sub {
+		print "combobox1 selection changed\n";
+	}
+);
 my $combobox2 = Gtk2::Ex::ComboBox->new($label2, 'with-checkbox');
 $combobox2->set_list_preselected([[0,'how'], [1,'when'], [1,'where']]);
+$combobox2->signal_connect('changed' => 
+	sub {
+		print "combobox2 selection changed\n";
+	}
+);
 
 my $combobox3 = Gtk2::Ex::ComboBox->new($label3, 'no-checkbox');
 $combobox3->set_list_preselected([[1,'how'], [0,'when'], [1,'where']]);
+$combobox3->signal_connect('changed' => 
+	sub {
+		print "combobox3 selection changed\n";
+	}
+);
 
 my $text = Gtk2::TextView->new;
 my $dumpbutton = Gtk2::Button->new('Show Details');

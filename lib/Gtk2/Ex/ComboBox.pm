@@ -1,6 +1,6 @@
 package Gtk2::Ex::ComboBox;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 use strict;
 use warnings;
@@ -56,6 +56,21 @@ sub new {
 sub signal_connect {
 	my ($self, $signal, $callback) = @_;
 	$self->{signals}->{$signal} = $callback;
+	my $slist = $self->{slist};
+	my $type = $self->{type};
+	if ( $type eq 'with-buttons' or $type eq 'with-checkbox') {
+		$slist->get_model()->signal_connect ('row-changed' =>
+			sub {
+				&{ $self->{signals}->{'changed'} };
+			}
+		);
+	} elsif ( $type eq 'no-checkbox' ) {
+		$slist->get_selection->signal_connect ('changed' =>
+			sub {
+				&{ $self->{signals}->{'changed'} };
+			}
+		);
+	}
 }
 
 sub get_treeview {
@@ -169,6 +184,8 @@ sub _make_checkable {
 	# Add a checkbutton to select all
 	$slist->set_headers_clickable(TRUE);
 	my $col = $slist->get_column(0);
+
+
 	my $check = Gtk2::CheckButton->new;
 	$col->set_widget($check);
 	$check->set_active(TRUE);
@@ -302,6 +319,16 @@ on the parent widget.
 Call this method to hide the ComboBox. This method does not have to be called 
 explicitly since the ComboBox is automatically closed if the user clicks anywhere
 outside.
+
+=head1 SIGNALS
+
+C<changed> - This signal gets emitted whenever the selection is changed.
+
+	$combobox1->signal_connect('changed' => 
+		sub {
+			print "combobox1 selection changed\n";
+		}
+	);
 
 =head1 AUTHOR
 
