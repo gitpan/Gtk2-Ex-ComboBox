@@ -1,6 +1,6 @@
 package Gtk2::Ex::ComboBox;
 
-our $VERSION = '0.05';
+our $VERSION = '0.07';
 
 use strict;
 use warnings;
@@ -36,7 +36,10 @@ sub new {
 		my $vbox = $self->_make_checkable;
 		$frame->add($vbox);
 	} elsif ($type eq 'no-checkbox') {
-		$frame->add($slist);
+		my $scrolledwindow = Gtk2::ScrolledWindow->new;
+		$scrolledwindow->set_policy('automatic', 'automatic');
+		$scrolledwindow->add($slist);
+		$frame->add($scrolledwindow);
 		$slist->get_selection->signal_connect ('changed' =>
 			sub {
 				my @sel = $slist->get_selected_indices;
@@ -50,6 +53,7 @@ sub new {
 		);
 	}
 	$popup->{window}->add($frame);
+	$popup->{window}->set_default_size(200, 200);
 	return $self;
 }
 
@@ -148,7 +152,7 @@ sub _make_selectable {
 	my $label = Gtk2::Label->new('Select');
 	my $allbutton = Gtk2::Button->new_from_stock('Select All');
 	my $nonebutton = Gtk2::Button->new_from_stock('Select None');
-	my $closebutton = Gtk2::Button->new_from_stock('gtk-close');
+	my $okbutton = Gtk2::Button->new_from_stock('gtk-ok');
 	$allbutton->signal_connect ('button-release-event' => 
 		sub {
 			foreach my $line (@{$slist->{data}}) {
@@ -163,18 +167,22 @@ sub _make_selectable {
 			}
 		}
 	);
-	$closebutton->signal_connect ('button-release-event' => 
+	$okbutton->signal_connect ('button-release-event' => 
 		sub {
 			$self->{popup}->hide;
 		}
 	);
 	
+	my $scrolledwindow = Gtk2::ScrolledWindow->new;
+	$scrolledwindow->set_policy('automatic', 'automatic');
+	$scrolledwindow->add($slist);
 	my $hbox = Gtk2::HBox->new (TRUE, 0);
 	$hbox->pack_start ($allbutton, FALSE, TRUE, 0);    
 	$hbox->pack_start ($nonebutton, FALSE, TRUE, 0);    
 	my $vbox = Gtk2::VBox->new (FALSE, 0);
 	$vbox->pack_start ($hbox, FALSE, TRUE, 0);
-	$vbox->pack_start ($slist, TRUE, TRUE, 0);
+	$vbox->pack_start ($scrolledwindow, TRUE, TRUE, 0);
+	$vbox->pack_start ($okbutton, FALSE, TRUE, 0);
 	return $vbox;
 }
 
@@ -213,7 +221,10 @@ sub _make_checkable {
 			}
 		}
 	);
-	return $slist;
+	my $scrolledwindow = Gtk2::ScrolledWindow->new;
+	$scrolledwindow->set_policy('automatic', 'automatic');
+	$scrolledwindow->add($slist);
+	return $scrolledwindow;
 }
 
 1;
